@@ -1,0 +1,52 @@
+@media (max-width: 700px) {
+  .site-header { height: calc(63px + env(safe-area-inset-top)); display: flex; justify-content: space-between; gap: 12px; }
+  .brand { font-size: .74rem; gap: 6px; }
+  .brand-seal { width: 29px; height: 29px; }
+  .brand-seal svg { width: 17px; }
+  .main-nav { gap: 15px; }
+  .main-nav a { font-size: .74rem; }
+  .nav-location { display: none; }
+  .hero-visual img { object-position: 63% 46%; }
+  .hero-shade { background: linear-gradient(90deg,#080b0aaf,#080b0a22 73%),linear-gradient(0deg,var(--bg) 1%,#080b0ae2 23%,#080b0a6e 60%,#080b0a00 100%); }
+  .mobile-br { display: initial; }
+  .coverflow-gesture { height: clamp(275px,46vh,430px); --cover-width: clamp(193px,55vw,325px); --cover-height: clamp(235px,38vh,392px); }
+  .carousel-arrow { width: 44px; height: 44px; top: auto; bottom: -22px; translate: none; }
+  .carousel-arrow.previous { left: 7%; }
+  .carousel-arrow.next { right: 7%; }
+  .journey-content { padding-top: 81px; }
+}
+@media (max-height: 480px) and (orientation: landscape) {
+  .site-header { height: calc(48px + env(safe-area-inset-top)); }
+  .journey-content { padding-top: 60px; min-height: 100dvh; }
+  .journey-tabs button { min-height: 44px; font-size: 1.35rem; padding-bottom: 5px; }
+  .coverflow-gesture { height: clamp(143px,44dvh,190px); --cover-width: clamp(152px,25vw,220px); --cover-height: clamp(134px,40dvh,175px); }
+  .cover-title { font-size: .93rem; bottom: 8px; }
+  .selected-journey h1 { margin: 0 0 4px; font-size: 1.13rem; }
+  .coverflow .carousel-dots { height: 25px; bottom: -22px; }
+  .journey-bottom { margin-top: 22px; }
+  .player-top { top: max(7px,env(safe-area-inset-top)); }
+  .watch-close { top: max(6px,env(safe-area-inset-top)); right: max(12px,env(safe-area-inset-right)); }
+  .playback-center { top: 46%; }
+  .playback-center .main-play { height: 56px; width: 56px; }
+  .main-play svg { width: 31px; }
+  .player-bottom { bottom: max(3px,env(safe-area-inset-bottom)); }
+  .preview-caption { bottom: 87px; }
+  .subtitle-layer { bottom: 90px; }
+  .frozen-note { top: max(9px,env(safe-area-inset-top)); }
+  .interaction-scroll { padding-top: max(14px,env(safe-area-inset-top)); padding-bottom: max(9px,env(safe-area-inset-bottom)); }
+  .game-panel { width: min(92%,650px); padding: 10px 15px 12px; }
+  .game-panel .interaction-title { margin-bottom: 8px; }
+  .game-panel .interaction-title h2 { font-size: clamp(1.23rem,4.9vh,1.53rem); margin: 1px 0 3px; }
+  .interaction-title .eyebrow { font-size: .65rem; }
+  .choice-panel { width: min(85%,670px); padding: 7px; }
+  .choice-panel .interaction-title { margin-bottom: 11px; }
+  .choice-panel .interaction-title h2 { font-size: clamp(1.18rem,5.5vh,1.63rem); }
+  .game-footer { margin-top: 7px; }
+  .game-footer .action { min-height: 44px; }
+  .sentence-slots { margin-bottom: 7px; }
+  .blessing-card { padding: 16px 12px; }
+  .blessing-card h2 { font-size: 2.15rem; }
+  .wish-emblem { width: 20px; height: 20px; margin-bottom: 4px; }
+  .wish-divider { margin: 7px auto; }
+  .sentence-success .success-emblem { width: 44px; height: 44px; }
+}

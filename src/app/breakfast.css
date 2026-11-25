@@ -1,0 +1,69 @@
+.breakfast-panel {
+  display: grid; align-items: center;
+  width: min(100%,1140px); padding: clamp(22px,3.6vw,51px); border-radius: clamp(13px,2vw,27px);
+  background: #090805dc; border-color: #d9c8a292; box-shadow: 0 22px 85px #000a;
+}
+.breakfast-view { grid-area: 1 / 1; min-width: 0; }
+.breakfast-panel .interaction-title { margin-bottom: clamp(17px,3.1dvh,34px); }
+.breakfast-panel .interaction-title .eyebrow { display: none; }
+.breakfast-select .interaction-title { text-align: left; }
+.breakfast-panel .interaction-title h2 { font-size: clamp(1.45rem,3.3vw,2.9rem); margin-block: 0 4px; }
+.breakfast-select .interaction-title > p { color: #e6dbbe; }
+.food-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: clamp(12px,3vw,41px); }
+.food-grid fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.food-grid legend, .food-result-group h3 {
+  width: 100%; padding: 0; margin: 0 0 10px; color: #eee4c9;
+  text-align: center; font-size: clamp(.87rem,2.05vw,1.48rem); font-weight: 730;
+}
+.food-options {
+  display: grid; gap: clamp(4px,.9dvh,10px); padding: clamp(5px,.85vw,13px);
+  border: 2px solid #b7a58a81; border-radius: clamp(10px,2vw,25px);
+}
+.food-option {
+  position: relative; display: grid; grid-template-columns: 47% minmax(0,1fr); gap: 8px; align-items: center; min-width: 0;
+  height: clamp(56px,10.2dvh,107px); padding: clamp(4px,.7vw,10px); border: 1px solid #9c71444f; border-radius: clamp(7px,1.1vw,15px);
+  background: var(--tsu-brown); color: var(--ivory); overflow: hidden; text-align: center;
+  transition: background .24s,border-color .24s,box-shadow .24s;
+}
+.food-option:hover { background: #664128; border-color: #ad875b; }
+.food-option[aria-pressed="true"] { border-color: var(--tsu-gold); box-shadow: inset 0 0 0 1px var(--tsu-gold); background: #5e4126; }
+.dish-photo { display: block; align-self: stretch; min-width: 0; background: #241a13 center / cover no-repeat; border-radius: clamp(5px,1vw,12px); }
+.dish-photo-empty { display: grid; place-items: center; color: #e0c493; }
+.dish-label { display: grid; gap: 2px; align-content: center; min-width: 0; line-height: 1.22; }
+.dish-label strong { color: #fff8e5; font-size: clamp(.8rem,1.55vw,1.31rem); font-weight: 700; }
+.dish-pinyin { color: #f2e0b9; font-size: clamp(.62rem,1.02vw,.93rem); overflow-wrap: anywhere; }
+.food-option .selection-check { position: absolute; top: 6px; left: 6px; box-shadow: 0 1px 6px #0009; }
+.food-result-group { display: grid; justify-items: center; min-width: 0; }
+.dish-result {
+  width: min(100%,260px); display: grid; gap: 8px; padding: clamp(5px,1vw,12px);
+  border-radius: clamp(8px,1.3vw,17px); border: 2px solid #628974; background: #eee9ca;
+  box-shadow: 0 4px 15px #0008;
+}
+.dish-result .dish-photo { aspect-ratio: 1.55; }
+.dish-result .dish-label { text-align: center; }
+.dish-result .dish-label > * { color: #291d10; }
+.dish-thai { font-size: clamp(.72rem,1.35vw,1.05rem); font-weight: 730; }
+.breakfast-panel .breakfast-footer { justify-content: space-between; margin-top: clamp(15px,4dvh,39px); }
+.breakfast-footer .food-count { color: #e4d7b5; font-size: clamp(.85rem,1.8vw,1.35rem); font-weight: 700; }
+.breakfast-footer .primary { min-width: clamp(114px,19vw,240px); }
+.breakfast-panel .breakfast-footer .action { font-size: clamp(.84rem,1.45vw,1.22rem); border-radius: 9px; }
+.breakfast-result .breakfast-footer .secondary { background: #193b2d; border-color: #a68d50; }
+.breakfast-result .breakfast-footer .secondary:hover { background: #284e38; border-color: #d6b673; }
+@media (min-height: 650px) {
+  .breakfast-panel .breakfast-footer .action { min-height: clamp(52px,7dvh,65px); padding-inline: 24px; }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  .game-panel.breakfast-panel { width: min(90%,760px); padding: 13px 19px; }
+  .breakfast-panel .food-grid { gap: 10px; }
+  .breakfast-panel .interaction-title { margin-bottom: 9px; }
+  .food-grid legend, .food-result-group h3 { font-size: .85rem; margin-bottom: 5px; }
+  .food-options { padding: 5px; }
+  .food-option { height: 46px; gap: 4px; padding: 3px; }
+  .dish-label { gap: 1px; }
+  .food-option .selection-check { top: 3px; left: 3px; }
+  .dish-result { width: min(100%,163px); gap: 3px; padding: 5px; }
+  .dish-result .dish-photo { aspect-ratio: 1.75; }
+  .breakfast-panel .breakfast-footer { margin-top: 12px; }
+  .breakfast-panel .breakfast-footer .action { padding-inline: 10px; font-size: .76rem; }
+}

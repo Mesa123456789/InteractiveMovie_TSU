@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import './base.css';
+@import './home.css';
+@import "./episode-detail.css";
+@import "./journey.css";
+@import "./watch.css";
+@import "./games.css";
+@import "./choices.css";
+@import "./breakfast.css";
+@import "./prayer.css";
+@import "./sentence.css";
+@import "./responsive.css";
