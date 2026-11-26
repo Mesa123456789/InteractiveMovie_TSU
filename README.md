@@ -1,6 +1,6 @@
 # ร่วมค้นพบไปกับหมวย
 
-A Thai-language interactive film about an exchange student in winter Beijing. The six presentation episodes follow seven main web scenes and their branches. Viewers make three choices, build a Beijing breakfast, receive a temple blessing and arrange a Mandarin sentence. Home, Watch, Journey and Ending are the four routes.
+A Thai-language interactive film about an exchange student in winter Beijing. The six presentation episodes follow seven main web scenes and their branches. Viewers make three choices, build a Beijing breakfast, receive a temple blessing and arrange a Mandarin sentence. Playback returns to Home after the last scene, where «เริ่มใหม่» starts a new playthrough.
 
 ## Run locally
 
@@ -23,11 +23,11 @@ Playwright uses Chromium at 1440 × 900 and at iPhone 13 viewport sizes. Screens
 
 ## Implementation
 
-- `src/app` contains the four App Router routes and styles.
+- `src/app` contains the Home, Watch and Journey pages, the legacy ending redirect, and styles.
 - `src/data` contains screenplay cuts, the episode map, interactions and media assignments.
 - `src/engine` resolves the narrative, frame boundaries, timeline and game rules.
 - `src/stores/useMovieStore.ts` manages versioned progress, unlocks and settings with Zustand and keeps replay in memory.
-- `src/components/player` handles still and video playback, controls, subtitles, retries and orientation. `src/features` contains Journey, Ending and the three games.
+- `src/components/player` handles still and video playback, controls, subtitles, retries and orientation. `src/features` contains Journey and the three games.
 - Motion for React handles component transitions, gestures and selection feedback. GSAP drives the reversible homepage episode reveal and the single prayer flash. CSS handles ambient effects, and dnd-kit provides pointer and keyboard tile movement.
 
 ## Swap in approved media

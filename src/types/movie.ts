@@ -1,6 +1,7 @@
 export type AssetKind = "image" | "video" | "audio" | "subtitle";
 export type Asset = { id: string; src: string; kind: AssetKind; bytes: number };
 export type Subtitle = "th" | "en" | "off";
+export type SubtitleCue = { at: number; text: string };
 export type SequenceId = "s1" | "s1b" | "s2" | "s3a" | "s3b" | "temple" | "s4" | "s5a" | "s5b" | "s6a" | "s6b" | "shared" | "s7";
 export type ChoiceId = "c1" | "c2" | "c3";
 export type GameId = "g1" | "g2" | "g3";
@@ -25,8 +26,8 @@ export type Shot = {
   audioAssetId?: string;
   freezeAssetId?: string;
   subtitles?: Partial<Record<"th" | "en" | "zh", string>>;
+  subtitleCues?: Partial<Record<"th" | "en" | "zh", readonly SubtitleCue[]>>;
   subtitleTracks?: Partial<Record<"th" | "en" | "zh", string>>;
-  cameraMotion: "static" | "zoom-in" | "zoom-out" | "pan-left" | "pan-right";
   transition: "cut" | "fade" | "dissolve";
 };
 

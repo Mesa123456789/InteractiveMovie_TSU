@@ -59,7 +59,7 @@ const progressSchema = z.object({
   attempts: z.number().int().min(0), solved: z.boolean(),
   completed: z.array(episodeSchema), unlocked: z.array(episodeSchema),
 });
-const baseSettings: Settings = { muted: false, volume: 0.85, subtitles: "off" };
+const baseSettings: Settings = { muted: false, volume: 0.85, subtitles: "th" };
 const keepCheckpointsOnRestart = true;
 const active = (state: WatchState) => state.replay?.progress ?? state.main;
 
@@ -174,9 +174,17 @@ export const useMovieStore = create<WatchState>()(persist((set, get) => {
     reset: () => set({ main: freshProgress(), replay: null, unlocked: {} }),
   };
 }, {
-  name: "muay-film-v2", version: 2, storage: createJSONStorage(() => localStorage),
+  name: "muay-film-v2", version: 3, storage: createJSONStorage(() => localStorage),
   partialize: ({ main, unlocked, settings }) => ({ main, unlocked, settings }),
   merge: resumed,
+  migrate: (saved, version) => {
+    if (version >= 3 || !saved || typeof saved !== "object") return saved;
+    const state = saved as Partial<WatchState>;
+    // Older builds shipped with subtitles off and no Thai track.
+    return state.settings?.subtitles === "off"
+      ? { ...state, settings: { ...state.settings, subtitles: "th" } }
+      : state;
+  },
   skipHydration: true,
 }));
 

@@ -1,4 +1,5 @@
 import { shotMedia, stills, type Still } from "./asset-mapping";
+import { finalCall, storySubtitles } from "./story-subtitles";
 import type { SequenceId, Shot } from "@/types/movie";
 
 type Group = { scene: string; cuts: string[]; still: Still; description: string };
@@ -59,11 +60,13 @@ export function shotsFor(id: SequenceId): readonly Shot[] {
     cuts.map((cut, cutIndex): Shot => {
       const key = scene + "/" + cut;
       const shotId = id + "/" + key;
+      const th = storySubtitles[id][key];
+      const call = id === "s7" && key === "SC06/5A";
       return {
         id: shotId, webSceneId: id, screenplayScene: scene, cut, description,
-        assetId: null, fallbackId: still, mediaType: "image", durationMs: 4000,
-        cameraMotion: cutIndex === 0 && (id === "s5b" || id === "temple") ? "pan-right" :
-          cutIndex === 0 && (id === "shared" || id === "s7") ? "zoom-in" : "static",
+        assetId: null, fallbackId: still, mediaType: "image", durationMs: call ? 18000 : 4000,
+        subtitles: th ? { th } : undefined,
+        subtitleCues: call ? { th: finalCall } : undefined,
         transition: cutIndex ? "cut" : index % 2 ? "fade" : "dissolve",
         ...shotMedia[shotId] ?? shotMedia[key],
       };

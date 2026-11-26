@@ -2,6 +2,150 @@
 import type { Asset } from "@/types/movie";
 export const assets = [
   {
+    "id": "artwork/lantern-lit-winter-market.png",
+    "src": "/artwork/lantern-lit-winter-market.png",
+    "kind": "image",
+    "bytes": 2143227
+  },
+  {
+    "id": "figma/breakfast-alternative.webp",
+    "src": "/figma/breakfast-alternative.webp",
+    "kind": "image",
+    "bytes": 100538
+  },
+  {
+    "id": "figma/breakfast-traditional.webp",
+    "src": "/figma/breakfast-traditional.webp",
+    "kind": "image",
+    "bytes": 170914
+  },
+  {
+    "id": "figma/breakfast.webp",
+    "src": "/figma/breakfast.webp",
+    "kind": "image",
+    "bytes": 186932
+  },
+  {
+    "id": "figma/dumpling-order.webp",
+    "src": "/figma/dumpling-order.webp",
+    "kind": "image",
+    "bytes": 93852
+  },
+  {
+    "id": "figma/enter-dumpling-shop.webp",
+    "src": "/figma/enter-dumpling-shop.webp",
+    "kind": "image",
+    "bytes": 101572
+  },
+  {
+    "id": "figma/hutong-arrival.webp",
+    "src": "/figma/hutong-arrival.webp",
+    "kind": "image",
+    "bytes": 213760
+  },
+  {
+    "id": "figma/hutong-tasting.webp",
+    "src": "/figma/hutong-tasting.webp",
+    "kind": "image",
+    "bytes": 262212
+  },
+  {
+    "id": "figma/leave-dumpling-shop.webp",
+    "src": "/figma/leave-dumpling-shop.webp",
+    "kind": "image",
+    "bytes": 149368
+  },
+  {
+    "id": "figma/order.webp",
+    "src": "/figma/order.webp",
+    "kind": "image",
+    "bytes": 85978
+  },
+  {
+    "id": "figma/pass-dumpling-shop.webp",
+    "src": "/figma/pass-dumpling-shop.webp",
+    "kind": "image",
+    "bytes": 123940
+  },
+  {
+    "id": "figma/prayer-wheel.webp",
+    "src": "/figma/prayer-wheel.webp",
+    "kind": "image",
+    "bytes": 126262
+  },
+  {
+    "id": "figma/shichahai-bridge.webp",
+    "src": "/figma/shichahai-bridge.webp",
+    "kind": "image",
+    "bytes": 176740
+  },
+  {
+    "id": "figma/shichahai-call.webp",
+    "src": "/figma/shichahai-call.webp",
+    "kind": "image",
+    "bytes": 149098
+  },
+  {
+    "id": "figma/shop.webp",
+    "src": "/figma/shop.webp",
+    "kind": "image",
+    "bytes": 237342
+  },
+  {
+    "id": "figma/summer-palace-arrival.webp",
+    "src": "/figma/summer-palace-arrival.webp",
+    "kind": "image",
+    "bytes": 227904
+  },
+  {
+    "id": "figma/summer-palace.webp",
+    "src": "/figma/summer-palace.webp",
+    "kind": "image",
+    "bytes": 352226
+  },
+  {
+    "id": "figma/temple-blessing.webp",
+    "src": "/figma/temple-blessing.webp",
+    "kind": "image",
+    "bytes": 207974
+  },
+  {
+    "id": "figma/temple-exit.webp",
+    "src": "/figma/temple-exit.webp",
+    "kind": "image",
+    "bytes": 342720
+  },
+  {
+    "id": "figma/tsinghua-arrival.webp",
+    "src": "/figma/tsinghua-arrival.webp",
+    "kind": "image",
+    "bytes": 175908
+  },
+  {
+    "id": "figma/tsinghua-friends.webp",
+    "src": "/figma/tsinghua-friends.webp",
+    "kind": "image",
+    "bytes": 144742
+  },
+  {
+    "id": "figma/tsinghua-snowball.webp",
+    "src": "/figma/tsinghua-snowball.webp",
+    "kind": "image",
+    "bytes": 174672
+  },
+  {
+    "id": "figma/wangfujing-arrival.webp",
+    "src": "/figma/wangfujing-arrival.webp",
+    "kind": "image",
+    "bytes": 236488
+  },
+  {
+    "id": "figma/wangfujing.webp",
+    "src": "/figma/wangfujing.webp",
+    "kind": "image",
+    "bytes": 284838
+  },
+  {
     "id": "preview/breakfast-reaction.webp",
     "src": "/preview/breakfast-reaction.webp",
     "kind": "image",

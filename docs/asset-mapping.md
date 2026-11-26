@@ -52,7 +52,6 @@ The breakfast redesign uses a separate set of nine newly generated food photogra
   interactionTime: 108,
   freezeAssetId: "final/c1.webp",
   subtitleTracks: { th: "captions/s1-th.vtt", en: "captions/s1-en.vtt" },
-  cameraMotion: "static",
   transition: "dissolve",
 }
 ```

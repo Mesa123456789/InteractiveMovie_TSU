@@ -1,10 +1,64 @@
 import { expect, test } from "@playwright/test";
 import { cdptouchSwipe, seed, snapshot } from "./fixtures";
 
+for (const availability of ["native", "unavailable", "rejected"] as const) {
+  test(`movie fullscreen works when the browser is ${availability}`, async ({ page }) => {
+    if (availability === "unavailable") {
+      await page.addInitScript(() => Object.defineProperty(HTMLElement.prototype, "requestFullscreen", { value: undefined }));
+    } else if (availability === "rejected") {
+      await page.addInitScript(() => Object.defineProperty(HTMLElement.prototype, "requestFullscreen", {
+        value: () => Promise.reject(new DOMException("Fullscreen blocked", "NotAllowedError")),
+      }));
+    }
+    await page.setViewportSize({ width: 844, height: 390 });
+    await seed(page, "c1");
+    await page.goto("/watch");
+    const player = page.locator(".watch-page");
+    const expand = page.getByRole("button", { name: "เต็มจอ", exact: true });
+    const shrink = page.getByRole("button", { name: "ออกจากเต็มจอ", exact: true });
+    await expand.tap();
+    await expect(player).toHaveAttribute("data-fullscreen", availability === "native" ? "native" : "viewport");
+    await expect(shrink).toHaveAttribute("aria-pressed", "true");
+    if (availability === "native") {
+      expect(await player.evaluate((el) => el === document.fullscreenElement)).toBe(true);
+    } else {
+      await expect(player).toHaveCSS("position", "fixed");
+    }
+    await page.getByRole("button", { name: "เข้าร้านเกี๊ยว" }).tap();
+    await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s2/);
+    await page.getByRole("button", { name: "เสียงและคำบรรยาย" }).tap();
+    await expect(page.getByRole("dialog", { name: "เสียงและคำบรรยาย" })).toBeVisible();
+    await page.getByRole("button", { name: "เสร็จ" }).tap();
+    await shrink.tap();
+    await expect(player).toHaveAttribute("data-fullscreen", "off");
+    expect((await snapshot(page)).main.choices.c1).toBe(0);
+    await page.getByRole("button", { name: "ปิดตัวเล่น" }).tap();
+    await expect(page).toHaveURL(/\/$/);
+  });
+}
+
+test("portrait viewing can continue from the rotation prompt and keeps the current minigame", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await seed(page, "g1");
+  await page.goto("/watch");
+  await page.getByRole("button", { name: "ดูในแนวตั้ง" }).tap();
+  await expect(page.locator(".orientation-prompt")).toHaveCount(0);
+  for (const name of ["โหยวเถียว", "เต้าหู้เค็ม", "เจียนปิ่งกั่วจื่อ"]) {
+    await page.getByRole("button", { name: new RegExp(name) }).tap();
+  }
+  await page.getByRole("button", { name: "ลองชิมเลย!" }).tap();
+  await expect(page.locator(".dish-result")).toHaveCount(3);
+  await page.setViewportSize({ width: 568, height: 320 });
+  await expect(page.locator(".dish-result")).toHaveCount(3);
+  await page.setViewportSize({ width: 320, height: 568 });
+  await expect(page.getByRole("button", { name: "บันทึกเมนูและเดินทางต่อ" })).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+});
+
 test("portrait homepage and coverflow support touch swipes without overflow", async ({ page }, info) => {
   await page.goto("/");
   await expect(page.getByRole("button", { name: "เริ่มการเดินทาง" })).toBeEnabled();
-  await expect(page.locator(".nav-location")).toBeHidden();
+  await expect(page.getByText("กรุงเทพฯ / ปักกิ่ง", { exact: true })).toHaveCount(0);
   const cardsOnHome = page.locator(".episode-card");
   const reveal = page.locator(".episode-reveal-toggle");
   await expect(reveal).toHaveAttribute("aria-expanded", "false");

@@ -1,11 +1,9 @@
 @media (max-width: 700px) {
   .site-header { height: calc(63px + env(safe-area-inset-top)); display: flex; justify-content: space-between; gap: 12px; }
-  .brand { font-size: .74rem; gap: 6px; }
+  .brand { gap: var(--space-1); }
   .brand-seal { width: 29px; height: 29px; }
   .brand-seal svg { width: 17px; }
-  .main-nav { gap: 15px; }
-  .main-nav a { font-size: .74rem; }
-  .nav-location { display: none; }
+  .main-nav { gap: var(--space-3); }
   .hero-visual img { object-position: 63% 46%; }
   .hero-shade { background: linear-gradient(90deg,#080b0aaf,#080b0a22 73%),linear-gradient(0deg,var(--bg) 1%,#080b0ae2 23%,#080b0a6e 60%,#080b0a00 100%); }
   .mobile-br { display: initial; }
@@ -17,11 +15,11 @@
 }
 @media (max-height: 480px) and (orientation: landscape) {
   .site-header { height: calc(48px + env(safe-area-inset-top)); }
-  .journey-content { padding-top: 60px; min-height: 100dvh; }
-  .journey-tabs button { min-height: 44px; font-size: 1.35rem; padding-bottom: 5px; }
-  .coverflow-gesture { height: clamp(143px,44dvh,190px); --cover-width: clamp(152px,25vw,220px); --cover-height: clamp(134px,40dvh,175px); }
-  .cover-title { font-size: .93rem; bottom: 8px; }
-  .selected-journey h1 { margin: 0 0 4px; font-size: 1.13rem; }
+  .journey-content { padding-block: calc(56px + env(safe-area-inset-top)) max(var(--space-2),env(safe-area-inset-bottom)); min-height: 100dvh; }
+  .journey-tabs button { padding-bottom: var(--space-1); }
+  .coverflow-gesture { height: clamp(134px,38dvh,170px); --cover-width: clamp(152px,25vw,220px); --cover-height: clamp(122px,34dvh,156px); }
+  .cover-title { bottom: var(--space-2); }
+  .selected-journey h1 { margin: 0 0 var(--space-1); }
   .coverflow .carousel-dots { height: 25px; bottom: -22px; }
   .journey-bottom { margin-top: 22px; }
   .player-top { top: max(7px,env(safe-area-inset-top)); }
@@ -29,24 +27,23 @@
   .playback-center { top: 46%; }
   .playback-center .main-play { height: 56px; width: 56px; }
   .main-play svg { width: 31px; }
+  .skip-play { width: 48px; height: 48px; }
+  .skip-icon { width: 34px; height: 34px; }
   .player-bottom { bottom: max(3px,env(safe-area-inset-bottom)); }
-  .preview-caption { bottom: 87px; }
-  .subtitle-layer { bottom: 90px; }
+  .subtitle-layer { bottom: calc(90px + env(safe-area-inset-bottom)); }
   .frozen-note { top: max(9px,env(safe-area-inset-top)); }
   .interaction-scroll { padding-top: max(14px,env(safe-area-inset-top)); padding-bottom: max(9px,env(safe-area-inset-bottom)); }
-  .game-panel { width: min(92%,650px); padding: 10px 15px 12px; }
-  .game-panel .interaction-title { margin-bottom: 8px; }
-  .game-panel .interaction-title h2 { font-size: clamp(1.23rem,4.9vh,1.53rem); margin: 1px 0 3px; }
-  .interaction-title .eyebrow { font-size: .65rem; }
-  .choice-panel { width: min(85%,670px); padding: 7px; }
-  .choice-panel .interaction-title { margin-bottom: 11px; }
-  .choice-panel .interaction-title h2 { font-size: clamp(1.18rem,5.5vh,1.63rem); }
-  .game-footer { margin-top: 7px; }
-  .game-footer .action { min-height: 44px; }
-  .sentence-slots { margin-bottom: 7px; }
-  .blessing-card { padding: 16px 12px; }
-  .blessing-card h2 { font-size: 2.15rem; }
-  .wish-emblem { width: 20px; height: 20px; margin-bottom: 4px; }
-  .wish-divider { margin: 7px auto; }
+  .game-panel { width: min(92%,650px); }
   .sentence-success .success-emblem { width: 44px; height: 44px; }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .playback-center { gap: clamp(var(--space-3),6vw,var(--space-6)); }
+  .player-top { padding-inline: var(--space-12); }
+  .watch-stage .interaction-scroll { padding: max(60px,env(safe-area-inset-top)) max(var(--space-3),env(safe-area-inset-right)) max(var(--space-3),env(safe-area-inset-bottom)) max(var(--space-3),env(safe-area-inset-left)); }
+  .choice-panel { padding: 0; }
+  .choice-media { height: clamp(104px,21dvh,190px); }
+  .choice-copy { padding-inline: var(--space-2); }
+  .audio-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--space-2); }
+  .audio-line { flex-wrap: wrap; }
 }

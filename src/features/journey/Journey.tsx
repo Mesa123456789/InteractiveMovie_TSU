@@ -11,7 +11,7 @@ import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { ArrowLeft, ArrowRight, LockKeyhole, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Action } from "@/components/ui/Action";
 import { checkpoints } from "@/data/checkpoints";
@@ -99,8 +99,8 @@ export function Journey() {
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -7 }} transition={{ duration: 0.19, ease }}>
           <p>EP {String(checkpoint.episode).padStart(2, "0")} <span>·</span> {episodes[checkpoint.episode - 1].title}</p>
           <h1>{checkpoint.title}</h1>
-          <Action className={unlocked[id] ? "primary" : "secondary"} disabled={!unlocked[id]} onClick={() => replay(id)}>
-            {unlocked[id] ? <><Play size={16} fill="currentColor"/>เล่นอีกครั้ง</> : <><LockKeyhole size={16}/>ยังไม่ปลดล็อก</>}
+          <Action variant={unlocked[id] ? "primary" : "secondary"} disabled={!unlocked[id]} onClick={() => replay(id)}>
+            {unlocked[id] ? "เล่นอีกครั้ง" : "ยังไม่ปลดล็อก"}
           </Action>
         </motion.div></AnimatePresence>
       </div>
@@ -196,8 +196,7 @@ function CheckpointCarousel({ tab, active, unlocked, onIndexChange, onExitComple
                 }}>
                 {picture && <span className="static-image" style={{ backgroundImage: "url(" + picture.src + ")" }} />}
                 <span className="cover-shade"/>
-                <span className="cover-top"><span className="episode-code">EP {String(target.episode).padStart(2, "0")}</span>
-                  <span className="cover-lock">{unlocked[item] ? <Play size={15} fill="currentColor"/> : <LockKeyhole size={16}/>}</span></span>
+                <span className="cover-top"><span className="episode-code">EP {String(target.episode).padStart(2, "0")}</span></span>
                 <span className="cover-title">{target.title}</span>
               </button>;
             }}

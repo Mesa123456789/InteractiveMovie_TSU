@@ -62,12 +62,15 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     await page.goto("/watch");
     await expect(page.locator(".choice-grid .choice-card").last()).toBeEnabled();
     const choice = await captureAnimation(page, ".choice-grid > :last-child .choice-card",
-      [".choice-fill", ".choice-cloud", ".choice-panel", ".media-surface"], 1050);
-    for (const [selector, end] of [[".choice-fill", 125], [".choice-cloud", 380]] as const) {
-      const frames = choice.series(selector);
-      expect(frames.every(({ same }) => same)).toBe(true);
-      expect(frames.filter(({ x }) => x > 5 && x < end).length).toBeGreaterThan(3);
-    }
+      [".choice-fill", ".choice-cloud", ".choice-panel", ".media-surface"], 1550);
+    const fill = choice.before[".choice-fill"]!;
+    expect(choice.series(".choice-fill").every((frame) => frame.same && frame.transform === fill.transform &&
+      frame.left === fill.left && frame.top === fill.top && frame.width === fill.width)).toBe(true);
+    const cloud = choice.series(".choice-cloud");
+    expect(cloud.filter(({ x }) => x > 5 && x < 350).length).toBeGreaterThan(3);
+    expect(Math.max(...cloud.map(({ x }) => x))).toBeGreaterThan(400);
+    expect(cloud.every((frame) => frame.same && Math.abs(frame.width - cloud[0].width) < 0.1 &&
+      Math.abs(frame.top - cloud[0].top) < 0.1)).toBe(true);
     const choiceLast = choice.frames.findLast(({ nodes }) => nodes[".choice-panel"])!;
     expect(choice.frames.find(({ nodes }) => nodes[".media-surface"])!.ms).toBeGreaterThan(choiceLast.ms);
     await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s1b/);
@@ -84,12 +87,20 @@ for (const reducedMotion of ["no-preference", "reduce"] as const) {
     await page.locator(".prayer-option").first().click();
     await expect(page.locator(".prayer-particles")).toHaveAttribute("data-particles-ready", "true");
     const blessing = await captureAnimation(page, ".prayer-footer button",
-      [".prayer-flash", ".blessing-card", ".blessing-action", ".prayer-particles"], 920);
+      [".prayer-flash", ".blessing-card", ".blessing-action", ".prayer-particles"], 1670);
     const glow = blessing.series(".prayer-flash").filter(({ width }) => width > 0);
     const center = glow[0].left + glow[0].width / 2;
-    expect(glow.every(({ left, width, same }) => same && Math.abs(left + width / 2 - center) < 2)).toBe(true);
+    expect(glow.every(({ left, top, width, height, same }) => same && Math.abs(width - height) < 1 &&
+      Math.abs(left + width / 2 - center) < 2 && Math.abs(top + height / 2 - 450) < 2)).toBe(true);
     expect(glow.filter(({ scale }) => scale > 0.25 && scale < 1.3).length).toBeGreaterThan(3);
-    expect(blessing.series(".blessing-card").filter(({ scale }) => scale > 0.25 && scale < 0.95).length).toBeGreaterThan(3);
+    const cards = blessing.series(".blessing-card").filter(({ width }) => width > 0);
+    expect(cards.filter(({ scale, opacity }) => scale > 0.55 && scale < 0.98 && opacity > 0).length).toBeGreaterThanOrEqual(3);
+    expect(cards.some(({ scale }) => scale > 1.01)).toBe(true);
+    const card = cards.at(-1)!;
+    expect(card.width / card.height).toBeCloseTo(0.73, 2);
+    expect(Math.abs(card.height / 900 - 0.67)).toBeLessThan(0.02);
+    expect(card.top / 900).toBeCloseTo(0.11, 2);
+    expect(card.left + card.width / 2).toBeCloseTo(720, 0);
     const actionPositions = blessing.series(".blessing-action").map(({ y }) => Math.round(y)).filter((y) => y > 0 && y < 12);
     expect(new Set(actionPositions).size).toBeGreaterThanOrEqual(2);
     expect(blessing.series(".prayer-particles").some(({ opacity }) => opacity > 0.2)).toBe(true);
@@ -105,6 +116,7 @@ test("homepage reveals the same six cards and reverses without scrolling the doc
   await expect(page.locator(".hero-actions button")).toBeEnabled();
   const toggle = page.locator(".episode-reveal-toggle");
   const rail = page.locator("#episodes");
+  await expect(page.locator(".home-page .grain")).toHaveCount(0);
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   await expect(rail).toHaveAttribute("inert", "");
   await expect(page.locator(".episode-card")).toHaveCount(6);
@@ -151,6 +163,9 @@ test("single-screen homepage, episode details, seeking, audio, auto-hide, close 
   await expect(start).toBeEnabled();
   const cards = page.locator(".episode-card");
   await expect(cards).toHaveCount(6);
+  for (const text of ["ภาพยนตร์โต้ตอบ", "กรุงเทพฯ / ปักกิ่ง", "6 ตอน", "ย้อนดูการเดินทาง"]) {
+    await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+  }
   await page.getByRole("button", { name: "ตอนทั้งหมด", exact: true }).click();
   await expect(page.locator("#episodes")).not.toHaveAttribute("inert", "");
   await expect(cards.last()).toBeInViewport({ ratio: 1 });
@@ -187,7 +202,10 @@ test("single-screen homepage, episode details, seeking, audio, auto-hide, close 
   await time.fill(await time.getAttribute("max") ?? "0");
   await expect(page.locator(".choice-panel")).toHaveCount(0);
   await time.fill("5");
+  await expect(page.locator(".subtitle-layer")).toHaveText("หมวยกำคูปองอาหารอยู่หน้าโรงอาหาร");
+  await expect(page.locator(".movie-still img").first()).toHaveCSS("object-fit", "cover");
   await page.getByRole("button", { name: "เสียงและคำบรรยาย" }).click();
+  await expect(page.getByRole("radio", { name: "ไทย" })).toBeChecked();
   await expect(page.getByRole("radio", { name: "English" })).toBeDisabled();
   await page.getByRole("button", { name: "เสร็จ" }).click();
   await expect(page.locator(".loading-overlay")).toHaveCount(0);
@@ -210,7 +228,7 @@ test("single-screen homepage, episode details, seeking, audio, auto-hide, close 
   await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s2/);
 });
 
-test("all games, checkpoints and branch-specific ending survive refresh", async ({ page }, info) => {
+test("all games and checkpoints survive refresh, and completion returns home for a new run", async ({ page }, info) => {
   await seed(page, "c1", {}, { c1: "s1" });
   await page.goto("/watch");
   await page.getByRole("button", { name: /กลับหอ/ }).click();
@@ -270,8 +288,12 @@ test("all games, checkpoints and branch-specific ending survive refresh", async 
   await finishSequence(page);
   await page.getByRole("button", { name: /Summer Palace/ }).click();
   await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s5b/);
+  const landscape = page.locator(".movie-still img");
+  await expect(landscape).toHaveCSS("animation-name", "none");
+  await expect(landscape).toHaveCSS("transform", "none");
   await finishSequence(page);
   await expect(page.locator(".frozen-frame")).toHaveAttribute("data-frame", "s5b/SC04/5B");
+  await expect(page.locator(".frozen-frame img")).toHaveCSS("object-fit", "cover");
   await page.screenshot({ path: info.outputPath("choice.png"), animations: "disabled" });
   await page.getByRole("button", { name: /มหาวิทยาลัยชิงหัว/ }).click();
   await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s6b/);
@@ -293,14 +315,20 @@ test("all games, checkpoints and branch-specific ending survive refresh", async 
   await expect(page.getByRole("heading", { name: "我想要一份饺子。" })).toBeVisible();
   await page.getByRole("button", { name: "ให้หมวยสั่งเลย" }).click();
   await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s7/);
+  await expect(page.locator(".subtitle-layer")).toContainText("我想要一份饺子。");
+  const endingSlider = page.getByRole("slider", { name: "ตำแหน่งรับชม" });
+  await endingSlider.fill("14");
+  await expect(page.locator(".subtitle-layer")).toContainText("นึกถึงเกี๊ยวฝีมือแม่");
   await finishSequence(page);
-  await expect(page).toHaveURL("/ending");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("หมวยเที่ยวจีน");
-  for (const text of ["กลับหอ", "Summer Palace", "มหาวิทยาลัยชิงหัว", "เจียวเฉวียน", "ชุดรสชาติใหม่", "一路平安", "我想要一份饺子。"]) {
-    await expect(page.locator(".ending-content").getByText(text, { exact: false })).toBeVisible();
-  }
-  await page.screenshot({ path: info.outputPath("ending.png"), animations: "disabled" });
-  await page.getByRole("button", { name: "ดูอีกครั้ง ลองทางอื่น" }).click();
+  await expect(page).toHaveURL("/");
+  const restart = page.getByRole("button", { name: "เริ่มใหม่", exact: true });
+  await expect(restart).toBeEnabled();
+  expect((await snapshot(page)).main).toMatchObject({
+    done: true, completed: [1, 2, 3, 4, 5, 6], choices: { c1: 1, c2: 1, c3: 1 }, solved: true,
+  });
+  await page.goto("/ending");
+  await expect(page).toHaveURL("/");
+  await restart.click();
   await expect(page.locator(".media-surface")).toHaveAttribute("data-shot", /^s1\//);
   expect((await snapshot(page)).main.choices).toEqual({});
   expect(Object.keys((await snapshot(page)).unlocked)).toHaveLength(6);
@@ -309,6 +337,7 @@ test("all games, checkpoints and branch-specific ending survive refresh", async 
 test("coverflow navigation, drag, card selection and isolated branch replay", async ({ page }, info) => {
   await seed(page, "s2", { time: 7, choices: { c1: 0 } }, { c1: "s1" });
   await page.goto("/journey");
+  await expect(page.getByText("ย้อนดูการเดินทาง", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "เล่นอีกครั้ง", exact: true })).toBeEnabled();
   await page.screenshot({ path: info.outputPath("journey-desktop.png"), animations: "disabled" });
   const main = (await snapshot(page)).main;

@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
-import { LockKeyhole, Play, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Action } from "@/components/ui/Action";
 import { ease, travelEase, travelSeconds } from "@/lib/motion";
 import type { Asset } from "@/types/movie";
@@ -56,8 +56,7 @@ export function EpisodeDetail({ title, number, summary, picture, playable, label
             <p className="eyebrow">EP {String(number).padStart(2, "0")}</p>
             <h2 id="detail-title">{title}</h2>
             <p id="detail-summary">{summary}</p>
-            <Action className="primary" disabled={!playable} onClick={() => dismiss("play")}>
-              {playable ? <Play size={17} fill="currentColor"/> : <LockKeyhole size={16}/>}
+            <Action variant="primary" disabled={!playable} onClick={() => dismiss("play")}>
               {playable ? label : "ยังไม่ปลดล็อก"}
             </Action>
           </motion.div>

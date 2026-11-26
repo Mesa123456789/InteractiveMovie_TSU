@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, Check, Utensils } from "lucide-react";
+import { Utensils } from "lucide-react";
 import { foodById, foodCategories } from "@/data/foods";
 import { asset, foodArtwork } from "@/data/asset-mapping";
 import { taste } from "@/engine/minigames";
@@ -48,7 +48,7 @@ export function BreakfastGame({ confirm }: { confirm: () => void }) {
       {reviewing ? <motion.section key="result" className="breakfast-view breakfast-result"
         initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
-        <InteractionTitle kind="มินิเกม 1" title="ผลลัพธ์การจับคู่"/>
+        <InteractionTitle title="ผลลัพธ์การจับคู่"/>
         <div className="food-grid">
           {menu.map(({ index, title }) => {
             const choice = food[index];
@@ -61,15 +61,15 @@ export function BreakfastGame({ confirm }: { confirm: () => void }) {
           })}
         </div>
         <div className="game-footer breakfast-footer">
-          <Action className="secondary" onClick={() => review(false)}>ลองจับคู่เมนูอื่นๆ</Action>
-          <Action className="primary" onClick={() => {
+          <Action variant="secondary" onClick={() => review(false)}>ลองจับคู่เมนูอื่นๆ</Action>
+          <Action variant="primary" onClick={() => {
             if (selectProgress(useMovieStore.getState()).breakfastReview) confirm();
-          }}>บันทึกเมนูและเดินทางต่อ<ArrowRight size={16}/></Action>
+          }}>บันทึกเมนูและเดินทางต่อ</Action>
         </div>
       </motion.section> : <motion.section key="selection" className="breakfast-view breakfast-select"
         initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }} transition={{ duration: 0.24 }}>
-        <InteractionTitle kind="มินิเกม 1" title="จับคู่อาหารมื้อนี้ให้หมวย" description="ช่วยตัดสินใจเลือกเมนูอย่างละหนึ่งจากทั้ง 3 หมวด"/>
+        <InteractionTitle title="จับคู่อาหารมื้อนี้ให้หมวย" description="ช่วยตัดสินใจเลือกเมนูอย่างละหนึ่งจากทั้ง 3 หมวด"/>
         <div className="food-grid">
           {menu.map(({ title, foods, index }) => <fieldset key={title}>
             <legend>{title}</legend>
@@ -80,7 +80,6 @@ export function BreakfastGame({ confirm }: { confirm: () => void }) {
                   aria-label={dish.th + " " + dish.zh} aria-pressed={selected} onClick={() => selectFood(index, dish.id)}
                   whileTap={{ scale: 0.98 }} transition={spring}>
                   <DishPhoto dish={dish}/><DishLabel dish={dish}/>
-                  {selected && <span className="selection-check" aria-hidden="true"><Check size={13}/></span>}
                 </motion.button>;
               })}
             </div>
@@ -88,7 +87,7 @@ export function BreakfastGame({ confirm }: { confirm: () => void }) {
         </div>
         <div className="game-footer breakfast-footer">
           <span className="food-count" role="status">เมนูในถาด {count}/3</span>
-          <Action className="primary" disabled={!valid} onClick={() => review(true)}>ลองชิมเลย!</Action>
+          <Action variant="primary" disabled={!valid} onClick={() => review(true)}>ลองชิมเลย!</Action>
         </div>
       </motion.section>}
     </AnimatePresence>

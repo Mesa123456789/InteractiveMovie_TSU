@@ -1,12 +1,13 @@
 .interaction-host, .interaction-layer { position: absolute; inset: 0; }
 .interaction-layer { z-index: 4; background: radial-gradient(ellipse at center,#080b0a62 0%,#080b0a9c 68%,#080b0adf 100%); }
 .interaction-scroll { height: 100%; display: grid; align-items: safe center; justify-items: center; padding: max(60px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(30px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left)); overflow-y: auto; overscroll-behavior: contain; }
-.interaction-title { text-align: center; margin: 0 auto 21px; }
+.interaction-title { display: grid; gap: var(--space-1); text-align: center; margin: 0 auto var(--game-heading-gap, var(--space-6)); }
 .interaction-title .eyebrow { justify-content: center; }
-.interaction-title h2 { font-weight: 730; letter-spacing: -.048em; color: #f8efde; font-size: clamp(1.5rem,4.1vw,2.88rem); line-height: 1.22; margin: 5px 0; text-wrap: balance; }
-.interaction-title > p:not(.eyebrow) { font-size: clamp(.82rem,1.4vw,1rem); color: #c5c9bb; }
-.game-panel { width: min(100%,760px); padding: clamp(15px,3.4vw,34px); border-radius: 10px; border: 1px solid #f2deb453; background: linear-gradient(153deg,#151e17f7,#0d1510ed); box-shadow: 0 22px 90px #0009; }
-.game-panel .interaction-title h2 { font-size: clamp(1.55rem,3.5vw,2.47rem); }
-.game-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; }
-.game-footer .action { min-height: 46px; }
-.selection-check { display: grid; place-items: center; width: 19px; height: 19px; flex: 0 0 19px; border-radius: 50%; background: var(--gold); color: #141a12; }
+.interaction-title h2 { color: #f8efde; font-size: var(--text-title); font-weight: var(--weight-title); line-height: var(--leading-heading); text-wrap: balance; }
+.interaction-title > p:not(.eyebrow) { color: #eee2c5; font-size: var(--text-section); font-weight: var(--weight-item); line-height: var(--leading-heading); text-wrap: balance; }
+.game-panel { width: min(100%,760px); padding: var(--panel-padding); border-radius: var(--panel-radius); border: var(--panel-border); background: var(--panel-background); box-shadow: 0 22px 90px #0009; }
+.game-footer { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--game-heading-gap, var(--space-6)); }
+:is(.game-footer, .sentence-actions, .orientation-actions):has(> .action.primary) > .action { --action-height: var(--primary-height); }
+@media (max-height: 480px) and (orientation: landscape) {
+  .interaction-scroll { --game-heading-gap: var(--space-2); }
+}

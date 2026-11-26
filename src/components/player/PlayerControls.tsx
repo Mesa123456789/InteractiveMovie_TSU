@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { AudioLines, Maximize, Minimize, Pause, Play, X } from "lucide-react";
+import { Maximize, Minimize, Pause, Play, X } from "lucide-react";
 import { clock } from "@/engine/playback-controller";
 import { useMovieStore } from "@/stores/useMovieStore";
 import { Modal } from "@/components/ui/Modal";
@@ -9,7 +9,24 @@ import { Action } from "@/components/ui/Action";
 import type { Subtitle } from "@/types/movie";
 
 export function CloseWatch({ close }: { close: () => void }) {
-  return <button className="icon-button watch-close" onClick={close} aria-label="ปิดตัวเล่น"><X size={25} strokeWidth={1.7}/></button>;
+  return <button type="button" className="icon-button watch-close" onClick={close} aria-label="ปิดตัวเล่น"><X size={25} strokeWidth={1.7}/></button>;
+}
+
+export function FullscreenButton({ active, toggle }: { active: boolean; toggle: () => void }) {
+  return <button type="button" className="icon-button fullscreen-button" onClick={toggle}
+    aria-label={active ? "ออกจากเต็มจอ" : "เต็มจอ"} aria-pressed={active}>
+    {active ? <Minimize size={20}/> : <Maximize size={20}/>}
+  </button>;
+}
+
+function SkipIcon({ direction }: { direction: -10 | 10 }) {
+  return <svg className="skip-icon" data-direction={direction} viewBox="0 0 40 40" fill="none" aria-hidden="true">
+    <g transform={direction > 0 ? "translate(40 0) scale(-1 1)" : undefined}>
+      <path d="M6.9 24.8 A13.5 13.5 0 1 0 12.3 10.4" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M14.4 5 L12.3 10.4 L17.9 11.9" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
+    </g>
+    <text x="19.8" y="26.5" textAnchor="middle" fill="currentColor" fontSize="14" fontWeight="800" fontFamily="Arial, sans-serif" letterSpacing="-0.5">10</text>
+  </svg>;
 }
 
 export function PlayerControls({ visible, playing, time, total, episode, title, close, toggle, seek, skip, audio, fullscreen, isFullscreen, feedback }: {
@@ -23,11 +40,11 @@ export function PlayerControls({ visible, playing, time, total, episode, title, 
       <div className="player-vignette"/>
       <header className="player-top"><div><small>EP {String(episode).padStart(2, "0")}</small><strong>{title}</strong></div><CloseWatch close={close}/></header>
       <div className="playback-center">
-        {[-10, 0, 10].map((seconds) => <motion.button key={seconds} className={"icon-button " + (seconds === 0 ? "main-play" : "skip-play")}
+        {([-10, 0, 10] as const).map((seconds) => <motion.button key={seconds} className={"icon-button " + (seconds === 0 ? "main-play" : "skip-play")}
           type="button" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
           aria-label={seconds < 0 ? "ย้อนกลับ 10 วินาที" : seconds > 0 ? "ไปข้างหน้า 10 วินาที" : playing ? "หยุดชั่วคราว" : "เล่น"}
-          onClick={() => seconds ? skip(seconds) : toggle()}>
-          {seconds ? <span className="skip-symbol" data-direction={seconds}><span>10</span></span>
+          onClick={(event) => { event.stopPropagation(); if (seconds) skip(seconds); else toggle(); }}>
+          {seconds ? <SkipIcon direction={seconds}/>
             : <AnimatePresence mode="wait" initial={false}><motion.span key={String(playing)}
               initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.12 }}>
               {playing ? <Pause size={41} fill="currentColor" strokeWidth={0}/> : <Play size={41} fill="currentColor" strokeWidth={0}/>}
@@ -42,9 +59,8 @@ export function PlayerControls({ visible, playing, time, total, episode, title, 
           <span>{clock(time)} <i>/</i> {clock(total)}</span>
         </div>
         <div className="player-tools">
-          <button className="icon-button audio-button" onClick={audio}><AudioLines size={17}/>เสียงและคำบรรยาย</button>
-          <button className="icon-button fullscreen-button" onClick={fullscreen} aria-label={isFullscreen ? "ออกจากเต็มจอ" : "เต็มจอ"}>
-            {isFullscreen ? <Minimize size={20}/> : <Maximize size={20}/>}</button>
+          <Action variant="text" className="audio-button" onClick={audio}>เสียงและคำบรรยาย</Action>
+          <FullscreenButton active={isFullscreen} toggle={fullscreen}/>
         </div>
       </div>
     </motion.div>
@@ -73,6 +89,6 @@ export function AudioSubtitleModal({ close, languages, hasAudio }: { close: () =
             onChange={() => set({ subtitles: id })}/>{label}{id !== "off" && !languages.includes(id) && <small>ยังไม่พร้อมใช้งาน</small>}</label>)}
       </fieldset>
     </div>
-    <Action className="primary" onClick={close}>เสร็จ</Action>
+    <Action variant="primary" onClick={close}>เสร็จ</Action>
   </Modal>;
 }

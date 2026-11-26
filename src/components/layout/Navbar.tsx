@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { Aperture, ArrowUpRight } from "lucide-react";
+import { Aperture } from "lucide-react";
 import { useEffect } from "react";
 import { useMovieStore } from "@/stores/useMovieStore";
 
@@ -26,7 +26,6 @@ export function Navbar() {
           </Link>
         ))}
       </nav>
-      {path !== "/" && <span className="nav-location"><ArrowUpRight size={13}/><span>กรุงเทพฯ / ปักกิ่ง</span></span>}
     </header>
   );
 }

@@ -33,6 +33,7 @@ export function SequencePlayback({ node, initial, portrait, close, finish, toggl
   const timeRef = useRef(time);
   const finishRef = useRef(false);
   const seekFlash = useRef<number>(undefined);
+  const feedbackId = useRef(0);
   const hide = useRef<number>(undefined);
   const writeAt = useRef(0);
   const stage = useRef<HTMLDivElement>(null);
@@ -41,13 +42,17 @@ export function SequencePlayback({ node, initial, portrait, close, finish, toggl
   const shot = entry?.shot;
   const source = shot && shotAsset(shot);
   const audioSource = asset(shot?.audioAssetId, "audio");
-  const mediaKey = [source?.id, shot?.mediaType === "video" || shot?.cameraMotion !== "static" ? shot?.id : "", retry].join("|");
+  const mediaKey = [source?.id, source?.kind === "video" ? shot?.id : "", retry].join("|");
   const missing = !source || failed === mediaKey;
   const readyNow = !!ready[mediaKey];
   const blocked = portrait || menu || missing || !readyNow;
   const running = playing && !blocked;
   const nextShot = entry && timeline.entries[timeline.entries.indexOf(entry) + 1]?.shot;
   usePreloadAssets(nextShot, node.nextNodeId);
+
+  const markReady = useCallback(() => {
+    setReady((old) => old[mediaKey] ? old : { ...old, [mediaKey]: true });
+  }, [mediaKey]);
 
   const persist = useCallback((value: number) => {
     const current = position(timeline.entries, value)?.shot;
@@ -126,15 +131,27 @@ export function SequencePlayback({ node, initial, portrait, close, finish, toggl
     update(target, true);
     const targetEntry = position(timeline.entries, target);
     if (targetEntry?.shot.id === entry.shot.id) {
-      if (video.current?.readyState) video.current.currentTime = target - entry.start + (shot?.startTime ?? 0);
-      if (audio.current?.readyState) audio.current.currentTime = target - entry.start;
+      const offset = Math.max(0, target - entry.start);
+      if (video.current && video.current.readyState >= 1) {
+        const clipStart = shot?.startTime ?? 0;
+        const maxTime = Number.isFinite(video.current.duration)
+          ? Math.max(clipStart, Math.min(shot?.interactionTime ?? video.current.duration, video.current.duration) - 0.03)
+          : clipStart + offset;
+        video.current.currentTime = Math.min(clipStart + offset, maxTime);
+      }
+      if (audio.current && audio.current.readyState >= 1) {
+        audio.current.currentTime = Number.isFinite(audio.current.duration)
+          ? Math.min(offset, Math.max(0, audio.current.duration - 0.03))
+          : offset;
+      }
     }
     reveal();
   }
 
   function skip(seconds: number) {
     seek(timeRef.current + seconds);
-    setFeedback({ direction: seconds, id: Date.now() });
+    feedbackId.current += 1;
+    setFeedback({ direction: seconds, id: feedbackId.current });
     window.clearTimeout(seekFlash.current);
     seekFlash.current = window.setTimeout(() => setFeedback(null), 430);
   }
@@ -156,7 +173,9 @@ export function SequencePlayback({ node, initial, portrait, close, finish, toggl
         reveal();
         stage.current?.focus({ preventScroll: true });
       }
-      if (event.defaultPrevented || menu || portrait || (event.target instanceof HTMLElement && event.target.closest("input,select,button,a,summary"))) return;
+      const target = event.target instanceof HTMLElement ? event.target : null;
+      if (event.defaultPrevented || menu || portrait || target?.closest("input,select,textarea,summary")) return;
+      if ((event.key === " " || event.key === "Enter") && target?.closest("button,a")) return;
       const actions: Record<string, () => void> = {
         " ": toggle, ArrowLeft: () => skip(-10), ArrowRight: () => skip(10),
         f: toggleFullscreen, m: () => useMovieStore.getState().setSettings({ muted: !useMovieStore.getState().settings.muted }),
@@ -170,28 +189,34 @@ export function SequencePlayback({ node, initial, portrait, close, finish, toggl
   });
 
   if (!shot || !entry) return <><FrameError retry={() => setRetry(retry + 1)}/><CloseWatch close={close}/></>;
-  const text = settings.subtitles === "off" || (source?.kind === "video" && asset(shot.subtitleTracks?.[settings.subtitles], "subtitle"))
-    ? undefined : shot.subtitles?.[settings.subtitles];
-  const fallback = !shot.assetId;
+  const language = settings.subtitles;
+  const text = language === "off" || !readyNow || missing || (source?.kind === "video" && asset(shot.subtitleTracks?.[language], "subtitle"))
+    ? undefined
+    : shot.subtitleCues?.[language]?.findLast((cue) => cue.at <= time - entry.start)?.text ?? shot.subtitles?.[language];
   return <div className="sequence-stage" ref={stage} tabIndex={-1} onPointerMove={reveal} onPointerDown={reveal}
     onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}
     onFocus={(event) => { if (event.target.matches(":focus-visible")) setFocused(true); }}>
     <div className="media-surface" onClick={reveal} data-shot={shot.id}>
       <AnimatePresence initial={false}>
-        {source?.kind === "image" && <ImageFrame key={mediaKey} shot={shot} source={source} retry={retry} ready={readyNow} playing={running}
-          onLoad={() => setReady((old) => old[mediaKey] ? old : { ...old, [mediaKey]: true })} onError={() => setFailed(mediaKey)}/>}
+        {source?.kind === "image" && <ImageFrame key={mediaKey} shot={shot} source={source} retry={retry} ready={readyNow}
+          onLoad={markReady} onError={() => setFailed(mediaKey)}/>}
       </AnimatePresence>
       {source?.kind === "video" && <video key={mediaKey} ref={video} className="movie-video" muted={settings.muted} playsInline preload="auto"
         src={source.src + (retry ? "?retry=" + retry : "")}
         onLoadedMetadata={(event) => {
           const element = event.currentTarget;
           if (Number.isFinite(element.duration)) setDurations((old) => old[shot.id] === element.duration ? old : { ...old, [shot.id]: element.duration });
-          const target = Math.max(0, timeRef.current - entry.start) + (shot.startTime ?? 0);
-          if (target > 0) element.currentTime = Math.min(target, Math.max(0, Math.min(shot.interactionTime ?? element.duration, element.duration) - 0.03));
+          const clipStart = shot.startTime ?? 0;
+          const target = Math.max(0, timeRef.current - entry.start) + clipStart;
+          const maxTime = Number.isFinite(element.duration)
+            ? Math.max(clipStart, Math.min(shot.interactionTime ?? element.duration, element.duration) - 0.03)
+            : target;
+          const clamped = Math.min(target, maxTime);
+          if (Math.abs(element.currentTime - clamped) > 0.05) element.currentTime = clamped;
         }}
-        onLoadedData={() => setReady((old) => old[mediaKey] ? old : { ...old, [mediaKey]: true })} onError={() => setFailed(mediaKey)}
+        onLoadedData={markReady} onError={() => setFailed(mediaKey)}
         onTimeUpdate={(event) => {
-          if (running) {
+          if (running && !event.currentTarget.seeking) {
             const relative = event.currentTarget.currentTime - (shot.startTime ?? 0);
             if (relative >= entry.duration) {
               event.currentTarget.pause();
@@ -208,7 +233,6 @@ export function SequencePlayback({ node, initial, portrait, close, finish, toggl
         event.currentTarget.currentTime = Math.max(0, timeRef.current - entry.start);
       }}/>}
     </div>
-    {fallback && !missing && <div className="preview-caption" title={shot.screenplayScene + " / " + shot.cut}><span>ภาพประกอบชั่วคราว</span><p>{shot.description}</p></div>}
     {!readyNow && !missing && <div className="loading-overlay" role="status" aria-label="กำลังโหลด"><Aperture size={24}/></div>}
     {missing ? <><FrameError retry={() => setRetry((value) => value + 1)}/><CloseWatch close={() => { persist(timeRef.current); close(); }}/></> :
       <PlayerControls visible={visible || !playing || menu || focused} playing={playing} time={time} total={timeline.total}

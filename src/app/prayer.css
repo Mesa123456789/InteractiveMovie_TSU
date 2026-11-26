@@ -1,66 +1,135 @@
-.prayer-stage { display: grid; place-items: center; width: min(100%,520px); }
-.prayer-panel, .blessing-wrap { grid-area: 1 / 1; position: relative; }
+.prayer-stage {
+  --blessing-width: min(30cqw, calc(var(--card-height) * .73));
+  --card-height: 67cqh;
+  --blessing-height: calc(var(--blessing-width) / .73);
+  display: grid; place-items: center; width: min(100%, clamp(540px, 64cqh, 680px));
+}
 .prayer-panel {
-  z-index: 1; padding: clamp(18px,3vw,34px); border-radius: 19px; border: 1px solid #b0954f;
-  background: linear-gradient(155deg,#142b21f7,#0b1712fa); box-shadow: 0 24px 70px #0009;
+  position: relative; z-index: 1; min-height: var(--blessing-height);
+  display: grid; grid-template-rows: auto minmax(min-content,1fr) auto; gap: var(--space-4);
 }
-.prayer-panel .interaction-title { margin-bottom: 21px; }
-.prayer-panel .interaction-title .eyebrow { display: none; }
-.prayer-panel .interaction-title h2 { margin-top: 0; }
-.prayer-panel .interaction-title > p { color: #eee2c5; }
-.prayer-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+.prayer-panel .interaction-title { margin-bottom: 0; }
+.prayer-grid {
+  display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); grid-auto-rows: minmax(min-content,1fr);
+  gap: var(--space-3);
+}
 .prayer-option {
-  position: relative; min-width: 0; min-height: clamp(78px,11dvh,104px); padding: 7px 5px;
-  display: grid; align-content: center; justify-items: center; gap: 3px; text-align: center; line-height: 1.2;
-  border: 1px solid #b29a5e; border-radius: 9px; background: #f2e8ce; color: #1d3527;
-  font-weight: 750; font-size: clamp(.73rem,1.45vw,.93rem); transition: background .19s,color .19s,box-shadow .19s;
+  position: relative; min-width: 0; min-height: 44px; padding: var(--space-2) var(--space-3);
+  display: grid; align-content: center; justify-items: center; gap: 6px; text-align: center; line-height: 1.32;
+  border: var(--panel-border); border-radius: var(--control-radius); background: #f2e8ce; color: #1d3527;
+  font-weight: var(--weight-heading); font-size: var(--text-section); transition: background .19s,color .19s,box-shadow .19s;
 }
-.prayer-option :is(svg,small) { color: #3f5747; }
-.prayer-option small { font-size: .63rem; font-weight: 500; }
+.prayer-option:focus-visible { outline-offset: -3px; }
+.prayer-option :is(span, small) { overflow-wrap: break-word; text-wrap: balance; }
+.prayer-icon { width: clamp(20px, 2.6cqh, 28px); height: clamp(20px, 2.6cqh, 28px); color: #3f5747; flex-shrink: 0; transition: color .19s; }
+.prayer-option small { color: #3f5747; font-size: var(--text-description); font-weight: var(--weight-body); line-height: 1.35; }
 .prayer-option:hover { background: #fff4d9; box-shadow: 0 4px 14px #0005; }
 .prayer-option[aria-pressed="true"] { background: #315741; color: #fff4d9; box-shadow: inset 0 0 0 1px #d1b273; }
-.prayer-option[aria-pressed="true"] :is(svg,small) { color: #f0d5a0; }
-.prayer-tick { position: absolute; top: 5px; right: 5px; }
-.prayer-footer { justify-content: center; }
+.prayer-option[aria-pressed="true"] :is(.prayer-icon, small) { color: #f0d5a0; }
+.prayer-panel .prayer-footer { margin-top: 0; justify-content: center; }
 .prayer-footer .action { width: min(100%,280px); }
 
-.prayer-darken { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center,#07090424 0%,#050704a0 73%); }
-.blessing-wrap { z-index: 2; display: grid; justify-items: center; gap: 15px; width: min(94%,370px); }
-.blessing-shell { position: relative; isolation: isolate; width: 100%; }
-.prayer-flash-position, .blessing-halo, .prayer-particles { position: absolute; pointer-events: none; }
-.interaction-scroll:has(.prayer-flash[data-active="true"]) { overflow: hidden; }
-.prayer-flash-position { z-index: -1; inset: 0; display: grid; place-items: center; }
-.prayer-flash[data-active="false"] { display: none; }
+.interaction-scroll:has(.prayer-stage[data-revealed="true"]) { overflow: hidden; }
+.prayer-darken {
+  position: absolute; inset: 0; opacity: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, #07090436 0%, #050704ad 78%);
+}
+.prayer-darken[data-revealed="true"] { opacity: 1; }
+.prayer-flash-position {
+  position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; pointer-events: none;
+}
 .prayer-flash {
-  position: absolute; width: min(70vw,660px); aspect-ratio: 1; opacity: 0;
-  background: radial-gradient(circle,#f5d581e0 0%,#d9aa57ad 13%,#b685406e 29%,#a06b2f32 47%,transparent 68%);
+  width: min(70cqw, 91cqh); aspect-ratio: 1 / 1; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, #ffecb3f5 0%, #f1cc799e 17%, #ce9c4e77 34%, #a06b2f2c 55%, transparent 76%);
+}
+.prayer-flash[data-active="false"] { visibility: hidden; }
+
+.blessing-wrap {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+}
+.blessing-shell { position: absolute; top: 11cqh; inset-inline: 0; margin-inline: auto; width: var(--blessing-width); }
+.blessing-heading {
+  position: absolute; bottom: 100%; inset-inline: -2em; padding-bottom: var(--space-2);
+  color: #e1bb73; text-align: center; font-size: var(--text-emphasis); font-weight: var(--weight-heading);
 }
 .blessing-halo {
-  z-index: -2; inset: -22px; border-radius: 17px; opacity: .72;
-  background: radial-gradient(ellipse,#f9d58d83 0%,#d7a6564a 51%,transparent 73%);
-  box-shadow: 0 0 84px #d6a55335;
+  position: absolute; top: calc(var(--blessing-height) / 2); left: 50%; translate: -50% -50%;
+  width: 165%; aspect-ratio: .73; border-radius: 50%; pointer-events: none; opacity: .64;
+  background: radial-gradient(ellipse closest-side, #f9d58dc0 24%, #d7a6567a 60%, #d7a65628 82%, transparent 100%);
 }
 .prayer-particles {
-  z-index: 3; left: 50%; top: 48%; width: min(91vw,730px); height: min(86dvh,640px); translate: -50% -50%;
-  opacity: 0; mask-image: radial-gradient(ellipse,#000 22%,#000b 56%,transparent 75%);
+  position: absolute; pointer-events: none; z-index: 2; left: 50%; top: 50%;
+  width: min(85cqw,105cqh); height: min(86cqh,640px); translate: -50% -50%;
+  opacity: 0; mask-image: radial-gradient(ellipse,#000 22%,#000b 56%,transparent 74%);
   filter: drop-shadow(0 0 3px #e6ad5d);
 }
 
-.blessing-card { position: relative; isolation: isolate; text-align: center; width: 100%; color: #381e14; padding: 31px 20px 33px; border-radius: 5px; border: 1px solid #e9c17c; background: radial-gradient(ellipse,#fff6dd 20%,#eed9ae 92%); box-shadow: 0 0 45px #e5b96f62,0 18px 60px #000a; }
-.blessing-card::before, .blessing-card::after { content: ""; pointer-events: none; position: absolute; border: 1px solid #8a542a85; inset: 8px; border-radius: 3px; }
-.blessing-card::after { inset: 12px; border-color: #a5734b5c; }
-.wish-emblem { color: #936132; margin: 0 auto 9px; }
-.blessing-card .eyebrow { justify-content: center; color: #74451f; font-weight: 700; }
-.blessing-card h2 { font-size: clamp(2.15rem,5.8vw,3.55rem); line-height: 1.18; margin: 8px 0; letter-spacing: .08em; }
-.blessing-pinyin { color: #66472c; font-size: .93rem; line-height: 1.3; }
-.wish-divider { width: 31px; height: 1px; background: #a3784d; display: block; margin: 14px auto 10px; }
-.blessing-copy > p:last-child { font-size: .88rem; }
+.blessing-card {
+  position: relative; display: grid; place-items: center; isolation: isolate; width: 100%; height: var(--blessing-height);
+  transform-origin: 50% 58.21%; color: #381e14; text-align: center; padding: var(--panel-padding);
+  border-radius: var(--panel-radius); border: 2px solid #ddaf5f; background: #f2e8ce;
+  box-shadow: 0 0 14px #e5b96f47, 0 16px 55px #0008;
+}
+.blessing-card::before {
+  content: ""; pointer-events: none; position: absolute; border: 1px solid #b78c4b85;
+  inset: var(--space-2); border-radius: var(--control-radius);
+}
+.blessing-copy {
+  width: 100%; min-height: calc(var(--blessing-height) * .66); max-height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  gap: var(--space-2); line-height: var(--leading-heading); text-wrap: balance;
+}
+.blessing-header, .blessing-main, .blessing-meta {
+  width: 100%; display: flex; flex-direction: column; align-items: center;
+}
+.blessing-header { gap: var(--space-1); }
+.blessing-emblem { width: clamp(22px, 3.2cqh, 34px); height: clamp(22px, 3.2cqh, 34px); color: #8c5c26; margin-bottom: 2px; flex-shrink: 0; }
+.blessing-main { gap: clamp(4px, .95cqh, 10px); }
+.blessing-meta { gap: var(--space-1); }
+.blessing-label { color: #865925; font-size: var(--text-description); font-weight: var(--weight-heading); letter-spacing: .04em; }
+.blessing-category { font-size: var(--text-card); font-weight: var(--weight-heading); line-height: var(--leading-heading); }
+.blessing-card h2 {
+  color: #381e14; font-size: min(var(--text-display), calc((var(--blessing-width) - 56px) / 4.2));
+  line-height: 1.24; font-weight: var(--weight-title); letter-spacing: .04em;
+}
+.blessing-pinyin { color: #785027; font-size: var(--text-emphasis); font-weight: var(--weight-body); }
+.blessing-translation { font-size: var(--text-translation); font-weight: var(--weight-heading); line-height: var(--leading-heading); }
+.wish-divider { width: 26%; min-height: 1px; background: #b68c4d9c; display: block; flex-shrink: 0; }
+.blessing-description { color: #65462e; font-size: var(--text-emphasis); font-weight: var(--weight-body); }
+.blessing-location { color: #765c46; font-size: var(--text-caption); font-weight: var(--weight-body); }
+.blessing-action { display: flex; justify-content: center; margin-top: var(--space-3); }
+.blessing-action .action { pointer-events: auto; }
+.blessing-wrap[inert] .action { pointer-events: none; }
 
 @media (max-height: 480px) and (orientation: landscape) {
-  .game-panel.prayer-panel { width: min(100%,510px); padding: 10px 14px; }
-  .prayer-panel .interaction-title { margin-bottom: 9px; }
-  .prayer-grid { gap: 6px; }
-  .prayer-option { min-height: 60px; padding: 4px; gap: 2px; font-size: .78rem; }
-  .prayer-option svg { width: 16px; height: 16px; }
-  .prayer-option small { font-size: .61rem; }
+  .prayer-stage { --card-height: min(74cqh, calc(91cqh - 60px - env(safe-area-inset-bottom))); }
+  .prayer-panel { gap: var(--space-2); padding: var(--space-2) var(--panel-padding); }
+  .prayer-grid { gap: var(--space-1); }
+  .prayer-option { gap: 1px; padding: var(--space-1); line-height: 1.2; }
+  .prayer-icon { width: 16px; height: 16px; }
+  .prayer-option small { line-height: 1.2; }
+  .blessing-shell { top: 9cqh; }
+  .blessing-heading { padding-bottom: var(--space-1); font-size: var(--text-description); }
+  .blessing-card { padding: var(--space-2); }
+  .blessing-copy { gap: 2px; line-height: 1.2; }
+  .blessing-header, .blessing-main, .blessing-meta { gap: 1px; }
+  .blessing-emblem { width: 17px; height: 17px; margin-bottom: 0; }
+  .blessing-category { font-size: var(--text-item); }
+  .blessing-card h2 { font-size: min(var(--text-display), calc((var(--blessing-width) - 24px) / 4.2)); }
+  .blessing-pinyin, .blessing-description { font-size: var(--text-pinyin); }
+  .blessing-translation { font-size: var(--text-item); }
+  .blessing-action { margin-top: var(--space-2); }
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .prayer-stage { --blessing-width: min(82cqw, calc(var(--card-height) * .73)); }
+  .prayer-panel { gap: var(--space-2); }
+  .prayer-grid { gap: var(--space-1); }
+}
+
+@media (max-height: 420px) and (orientation: landscape) {
+  .prayer-panel .interaction-title {
+    display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap;
+    column-gap: var(--space-3); row-gap: 0;
+  }
 }

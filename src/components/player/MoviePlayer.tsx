@@ -14,16 +14,18 @@ import { PrayerGame } from "@/features/prayer-game/PrayerGame";
 import { SentenceGame } from "@/features/sentence-game/SentenceGame";
 import { selectProgress, useMovieStore } from "@/stores/useMovieStore";
 import { useOrientation } from "@/hooks/useOrientation";
+import { usePlayerFullscreen } from "@/hooks/usePlayerFullscreen";
 import { lastShot } from "@/engine/scene-resolver";
 import { usePreloadAssets } from "@/hooks/usePreloadAssets";
 import { SequencePlayback } from "./SequencePlayback";
 import { FrameError, FreezeFrame } from "./MediaStage";
-import { CloseWatch } from "./PlayerControls";
+import { CloseWatch, FullscreenButton } from "./PlayerControls";
 import type { CheckpointId, MainProgress } from "@/types/movie";
 import type { StoryEvent } from "@/engine/narrative-engine";
 
-function WatchInteraction({ id, progress, close, advance, portrait, replay }: {
+function WatchInteraction({ id, progress, close, advance, portrait, replay, fullscreen, toggleFullscreen }: {
   id: CheckpointId; progress: MainProgress; close: () => void; advance: (event: StoryEvent) => void; portrait: boolean; replay: boolean;
+  fullscreen: boolean; toggleFullscreen: () => void;
 }) {
   const [retry, setRetry] = useState(0);
   const [failed, setFailed] = useState(false);
@@ -45,7 +47,10 @@ function WatchInteraction({ id, progress, close, advance, portrait, replay }: {
       </div>}
     {!shot.assetId && !error && <div className="frozen-note">ภาพประกอบชั่วคราว</div>}
     {replay && <div className="replay-note">เล่นย้อนหลัง</div>}
-    <CloseWatch close={close}/>
+    <div className="watch-corner">
+      <FullscreenButton active={fullscreen} toggle={toggleFullscreen}/>
+      <CloseWatch close={close}/>
+    </div>
   </>;
 }
 
@@ -55,27 +60,17 @@ export function MoviePlayer() {
   const hydrated = useMovieStore((state) => state.hydrated);
   const replay = useMovieStore((state) => state.replay);
   const chapter = nodes[progress.node];
-  const portrait = useOrientation();
+  const isPortrait = useOrientation();
+  const [allowPortrait, setAllowPortrait] = useState(false);
+  const portrait = isPortrait && !allowPortrait;
   const stage = useRef<HTMLElement>(null);
-  const [fullscreen, setFullscreen] = useState(false);
+  const {mode, toggle: toggleFullscreen} = usePlayerFullscreen(stage);
+  const fullscreen = mode !== null;
   const [ending, setEnding] = useState(false);
   const close = useCallback(() => {
     const path = useMovieStore.getState().replay?.returnTo ?? "/";
     router.push(path);
   }, [router]);
-
-  const toggleFullscreen = useCallback(() => {
-    const root = stage.current;
-    if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
-    else if (root?.requestFullscreen) void root.requestFullscreen().catch(() => {});
-    else root?.querySelector<HTMLVideoElement & { webkitEnterFullscreen?: () => void }>("video")?.webkitEnterFullscreen?.();
-  }, []);
-
-  useEffect(() => {
-    const onFullscreen = () => setFullscreen(!!document.fullscreenElement);
-    document.addEventListener("fullscreenchange", onFullscreen);
-    return () => document.removeEventListener("fullscreenchange", onFullscreen);
-  }, []);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -95,12 +90,13 @@ export function MoviePlayer() {
   const finish = useCallback(() => advance({ type: "finish" }), [advance]);
 
   if (!hydrated || !progress.started || replay?.complete) return <main className="page-loading"><Aperture className="loading-aperture" aria-label="กำลังโหลด"/></main>;
-  return <main className="watch-page" ref={stage}>
+  return <main className="watch-page" ref={stage} data-fullscreen={mode ?? "off"}>
     <div className="watch-stage" inert={portrait} aria-hidden={portrait}>
       {chapter.type === "sequence" && <SequencePlayback key={(replay?.key ?? "main") + chapter.id} node={chapter} initial={progress}
         portrait={portrait} close={close} finish={finish} fullscreen={fullscreen} toggleFullscreen={toggleFullscreen}/>}
       {(chapter.type === "choice" || chapter.type === "minigame") && <WatchInteraction key={(replay?.key ?? "main") + chapter.id}
-        id={chapter.id} progress={progress} close={close} advance={advance} portrait={portrait} replay={!!replay}/>}
+        id={chapter.id} progress={progress} close={close} advance={advance} portrait={portrait} replay={!!replay}
+        fullscreen={fullscreen} toggleFullscreen={toggleFullscreen}/>}
       {chapter.type === "ending" && <FreezeFrame shot={lastShot("s7")} source={shotAsset(lastShot("s7"))}
         override={asset(lastShot("s7").freezeAssetId, "image")} retry={0} onError={() => {}}/>}
       <AnimatePresence>{(ending || chapter.type === "ending") && <motion.div className="ending-fade" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.62 }}/>}</AnimatePresence>
@@ -108,7 +104,10 @@ export function MoviePlayer() {
     {portrait && <div className="orientation-prompt" role="dialog" aria-modal="true" aria-labelledby="orientation-title">
       <div className="rotation-orbit"><Smartphone size={62} strokeWidth={1.1}/><RotateCw className="rotate-arrow" size={22}/></div>
       <h1 id="orientation-title">หมุนจอเป็นแนวนอน<br/>เพื่อเริ่มรับชมภาพยนตร์</h1>
-      <Action className="secondary" onClick={close}>{replay ? "กลับไปการเดินทาง" : "กลับหน้าหลัก"}</Action>
+      <div className="orientation-actions">
+        <Action variant="primary" onClick={() => setAllowPortrait(true)}>ดูในแนวตั้ง</Action>
+        <Action variant="secondary" onClick={close}>{replay ? "กลับไปการเดินทาง" : "กลับหน้าหลัก"}</Action>
+      </div>
     </div>}
     {process.env.NODE_ENV === "development" && <DebugPanel />}
   </main>;

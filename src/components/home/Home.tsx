@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronUp, LockKeyhole, MapPin, Play } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import { artwork, asset, episodeArtwork } from "@/data/asset-mapping";
@@ -51,7 +51,6 @@ export function Home() {
       </div>
       <div className="hero-shade" aria-hidden="true" />
       <div className="episode-gradient" aria-hidden="true" />
-      <div className="grain" aria-hidden="true" />
       <Navbar />
       <section className="hero" aria-labelledby="film-title">
         <div className="hero-content page-gutter">
@@ -59,8 +58,8 @@ export function Home() {
           <p className="hero-tag">จากรสชาติที่คิดถึงบ้าน<br className="mobile-br"/> สู่การเปิดใจให้โลกใหม่</p>
           <p className="hero-note"><MapPin size={13} /> ปักกิ่ง ประเทศจีน</p>
           <div className="hero-actions">
-            <Action className="primary" disabled={!hydrated} onClick={() => { start(main.done); router.push("/watch"); }}>
-              <Play size={18} fill="currentColor" />{roll}
+            <Action variant="primary" disabled={!hydrated} onClick={() => { start(main.done); router.push("/watch"); }}>
+              {roll}
             </Action>
           </div>
         </div>
@@ -82,7 +81,6 @@ export function Home() {
                   {picture && <Image src={picture.src} alt="" fill sizes="(max-width: 630px) 155px, 17vw" />}
                   <span className="episode-shade" />
                   <span className="episode-code">EP {String(episode.id).padStart(2, "0")}</span>
-                  <span className="episode-icon">{complete ? <Check size={15}/> : unlocked ? <Play size={15} fill="currentColor"/> : <LockKeyhole size={14}/>}</span>
                   {(active || complete) && <span className="episode-track"><motion.span className="episode-meter" initial={{ scaleX: 0 }}
                     animate={{ scaleX: complete ? 1 : duration ? main.time / duration : 0.98 }}/></span>}
                 </span>
@@ -92,11 +90,10 @@ export function Home() {
           })}
         </div>
       </section>
-      <button className="episode-reveal-toggle" type="button"
+      <Action variant="text" className="episode-reveal-toggle"
         aria-expanded={expanded} aria-controls="episodes" onClick={() => reveal(!expanded)}>
-        <ChevronUp aria-hidden="true" size={18} />
-        <span>{expanded ? "ซ่อนตอนทั้งหมด" : "ตอนทั้งหมด"}</span>
-      </button>
+        {expanded ? "ซ่อนตอนทั้งหมด" : "ตอนทั้งหมด"}
+      </Action>
       {detail && selected && <EpisodeDetail title={detail.title} number={detail.id} summary={summaries[detail.id]}
         picture={asset(episodeArtwork[detail.id], "image") ?? asset(detail.image, "image")} origin={selected.origin}
         playable={hydrated && main.unlocked.includes(detail.id)} label={detailLabel} close={() => setSelected(null)}

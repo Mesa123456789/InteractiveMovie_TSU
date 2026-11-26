@@ -1,22 +1,20 @@
 .episode-dialog[open] {
   position: fixed; inset: 0; width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0;
-  display: grid; place-items: center; padding: 12px; overflow: hidden; color: var(--ivory); background: transparent;
+  display: grid; place-items: center;
+  padding: max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+  overflow: hidden; color: var(--ivory); background: transparent;
 }
 .episode-dialog::backdrop { background: transparent; }
 .episode-dialog-shade { position: absolute; inset: 0; pointer-events: none; background: #050806c9; }
-.episode-detail-position { width: min(680px,100%); height: min(475px,calc(100dvh - 24px)); pointer-events: none; }
+.episode-detail-position { width: min(680px,100%); height: min(475px,100%); pointer-events: none; }
 .episode-detail {
   isolation: isolate; position: relative; display: grid; align-items: end; width: 100%; height: 100%; pointer-events: auto;
-  border-radius: 14px; overflow: hidden; background: #0b110d; border: 1px solid #e6cb9773; box-shadow: 0 32px 90px #000c;
+  border-radius: var(--panel-radius); overflow: hidden; background: #0b110d; border: 1px solid #e6cb9773; box-shadow: 0 32px 90px #000c;
 }
 .episode-detail > img { object-fit: cover; object-position: center 39%; z-index: -2; }
 .episode-detail-shade { position: absolute; inset: 0; background: linear-gradient(0deg,#080e0afa 5%,#080e0ac9 27%,#080e0a40 69%,transparent); z-index: -1; }
-.episode-detail-copy { padding: clamp(18px,5vw,37px); }
-.episode-detail-copy h2 { font-size: clamp(1.55rem,5vw,3rem); font-weight: 750; line-height: 1.15; margin-block: 7px; }
-.episode-detail-copy > p:not(.eyebrow) { margin-bottom: 16px; max-width: 490px; font-size: clamp(.84rem,2.55vw,1rem); color: #f2e7d4; }
+.episode-detail-copy { padding: var(--panel-padding); }
+.episode-detail-copy h2 { font-size: var(--text-title); font-weight: var(--weight-title); line-height: var(--leading-heading); margin-block: var(--space-2); }
+.episode-detail-copy > p:not(.eyebrow) { margin-bottom: var(--space-4); max-width: 490px; font-size: var(--text-description); color: #f2e7d4; }
 .episode-detail-close { position: absolute; top: 10px; right: 10px; border-radius: 50%; background: #090e0cce; border: 1px solid var(--edge); }
 .episode-detail-close:hover { background: #2b3b31; }
-@media (max-height: 460px) {
-  .episode-detail-copy { padding: 18px; }
-  .episode-detail-copy h2 { font-size: 1.65rem; }
-}

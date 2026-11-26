@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 import { DndContext, DragOverlay, PointerSensor, rectIntersection, useDraggable, useDroppable, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { motion } from "motion/react";
-import { ArrowRight, Check, RotateCcw, Volume2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { Action } from "@/components/ui/Action";
 import { InteractionTitle } from "@/components/interaction/Interaction";
 import { answer, hints, sentence, wordById, words } from "@/data/sentences";
@@ -135,13 +135,13 @@ export function SentenceGame({ confirm }: { confirm: () => void }) {
     <p className="eyebrow">เรียงประโยคถูกต้อง</p>
     <h2 className="chinese" lang="zh-Hans" ref={success} tabIndex={-1}>{sentence.zh}</h2>
     <p className="sentence-pinyin">{sentence.pinyin}</p><p>{sentence.th}</p>
-    <div className="sentence-actions"><Action className="secondary" onClick={speak}><Volume2 size={17}/>ฟังเสียง</Action>
-      <Action className="primary" onClick={confirm}>ให้หมวยสั่งเลย<ArrowRight size={17}/></Action></div>
+    <div className="sentence-actions"><Action variant="secondary" onClick={speak}>ฟังเสียง</Action>
+      <Action variant="primary" onClick={confirm}>ให้หมวยสั่งเลย</Action></div>
     <p className="audio-message" role="status">{audioMessage}</p>
   </motion.div>;
 
   return <motion.div className="game-panel sentence-panel" ref={board} variants={stagger} initial="hidden" animate="visible">
-    <motion.div variants={rise}><InteractionTitle kind="มินิเกม 3" title="ช่วยหมวยสั่งเกี๊ยว" description={"“" + sentence.th + "”"}/></motion.div>
+    <motion.div variants={rise}><InteractionTitle title="ช่วยหมวยสั่งเกี๊ยว" description={"“" + sentence.th + "”"}/></motion.div>
     <DndContext id={id} sensors={sensors} collisionDetection={rectIntersection} onDragStart={({ active }) => { setPickup(null); setDragging(String(active.id)); }}
       onDragCancel={() => setDragging(null)} onDragEnd={drop} accessibility={{ screenReaderInstructions: {
         draggable: "กด Space เพื่อหยิบคำ ใช้ปุ่มลูกศรเลือกช่อง แล้วกด Space เพื่อวาง หรือกด Enter เพื่อแตะเลือกคำ",
@@ -158,14 +158,14 @@ export function SentenceGame({ confirm }: { confirm: () => void }) {
     <motion.div className="game-footer sentence-footer" variants={rise}>
       <p className="sentence-hint" role="status">{pickup ? pickup.index < 0 ? "ใช้ปุ่มลูกศรเพื่อเลือกช่อง" : "ช่อง " + (pickup.index + 1) + " · กด Space เพื่อวางคำ"
         : attempts ? hints[Math.min(attempts - 1, hints.length - 1)] : "ลากหรือแตะคำเพื่อเรียงประโยค"}</p>
-      <div className="sentence-actions"><Action className="secondary sentence-clear" onClick={() => {
+      <div className="sentence-actions"><Action variant="text" onClick={() => {
         setReviewedAttempt(attempts); setChecked([]); setErrors([]); clearWords();
-      }}><RotateCcw size={15}/>ล้างคำ</Action>
-        {retry ? <Action className="sentence-retry" onClick={() => {
+      }}>ล้างคำ</Action>
+        {retry ? <Action variant="primary" onClick={() => {
           setReviewedAttempt(attempts);
           setErrors([]);
           requestAnimationFrame(() => board.current?.querySelector<HTMLButtonElement>(".word-bank button")?.focus());
-        }}>ลองใหม่อีกครั้ง</Action> : <Action className="primary" disabled={!ready} onClick={verify}>ตรวจคำตอบ</Action>}</div>
+        }}>ลองใหม่อีกครั้ง</Action> : <Action variant="primary" disabled={!ready} onClick={verify}>ตรวจคำตอบ</Action>}</div>
     </motion.div>
   </motion.div>;
 }
